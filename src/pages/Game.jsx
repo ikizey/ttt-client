@@ -1,16 +1,82 @@
-import React from 'react';
-
-const GRID = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { GRID } from '../models/Grid';
+import { GameContext } from '../store/GameContext';
 
 const Game = () => {
+  const {
+    makeMove,
+    playerName,
+    opponentName,
+    concede,
+    isWinner,
+    moves,
+    isMyTurn,
+    isInQueue,
+  } = useContext(GameContext);
+
+  if (isInQueue) {
+    return (
+      <div className='flex flex-col justify-center items-center w-full h-screen border gap-2'>
+        <div>Waiting for opponent...</div>
+      </div>
+    );
+  }
+  const vs = (
+    <p className='font-semibold text-md'>
+      {playerName} vs {opponentName}
+    </p>
+  );
+
+  let winLose;
+  if (isWinner === true) {
+    winLose = (
+      <h2 className='text-green-500 font-bold text-xl3 border border-blue-500 rounded-md px-4 py-2'>
+        YOU Win!{playerName}
+      </h2>
+    );
+  } else if (isWinner === false) {
+    winLose = (
+      <h2 className='text-red-500 font-bold text-xl3 border border-blue-500 rounded-md px-4 py-2'>
+        YOU Lose!{playerName}
+      </h2>
+    );
+  }
+
   return (
-    <div className='grid grid-cols-3 gap-1'>
-      {GRID.map((cell) => (
-        <div
-          key={cell}
-          className='h-20 w-20 bg-blue-500 hover:bg-blue-800'
-        ></div>
-      ))}
+    <div className='flex flex-col justify-center items-center w-full h-screen border gap-2'>
+      <h3>{vs}</h3>
+      <h3>Turn of: {isMyTurn ? playerName : opponentName}</h3>
+      <div className='flex flex-wrap w-60 h-60'>
+        {GRID.map((cell, index) => (
+          <div
+            key={cell}
+            className='h-20 w-20 text-gray-200 hover:text-white text-xl3 font-bold bg-blue-500 hover:bg-blue-800 flex justify-center items-center'
+            onClick={
+              isMyTurn && isWinner === undefined
+                ? () => makeMove(cell)
+                : () => {}
+            }
+          >
+            {moves[index]}
+          </div>
+        ))}
+      </div>
+      {isWinner === undefined ? (
+        <button
+          className='px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900'
+          onClick={concede}
+        >
+          Concede
+        </button>
+      ) : (
+        <Link
+          to='/'
+          className='px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-900'
+        >
+          Leave
+        </Link>
+      )}
     </div>
   );
 };

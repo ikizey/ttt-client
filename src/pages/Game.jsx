@@ -32,19 +32,20 @@ const Game = () => {
   if (isWinner === true) {
     winLose = (
       <h2 className='text-green-500 font-bold text-xl3 border border-blue-500 rounded-md px-4 py-2'>
-        YOU Win!{playerName}
+        YOU Win! {playerName}
       </h2>
     );
   } else if (isWinner === false) {
     winLose = (
       <h2 className='text-red-500 font-bold text-xl3 border border-blue-500 rounded-md px-4 py-2'>
-        YOU Lose!{playerName}
+        YOU Lose! {playerName}
       </h2>
     );
   }
 
   return (
     <div className='flex flex-col justify-center items-center w-full h-screen border gap-2'>
+      <h1>{isWinner !== undefined && winLose}</h1>
       <h3>{vs}</h3>
       <h3>Turn of: {isMyTurn ? playerName : opponentName}</h3>
       <div className='flex flex-wrap w-60 h-60'>

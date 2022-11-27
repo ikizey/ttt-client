@@ -12,14 +12,22 @@ export const GameContext = createContext();
 const GameContextProvider = ({ children }) => {
   const [gameId, setGameId] = useState('global');
   const [playerID, setPlayerID] = useState('');
-  const [playerName, setPlayerName] = useState('user23443241');
+  const [playerName, setPlayerName] = useState('');
   const [opponentName, setOpponentName] = useState('unknown');
   const [opponentID, setOpponentID] = useState('unknown');
   const [totalPlayers, setTotalPlayers] = useState(0);
   const [isWinner, setIsWinner] = useState(undefined);
-  const [moves, setMoves] = useState(['', '', '', '', '', '', '', '', '']);
+  const [moves, setMoves] = useState([''.repeat(8)]);
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [isInQueue, setIsInQueue] = useState(false);
+
+  const resetGame = () => {
+    setGameId('global');
+    setOpponentName('');
+    setIsWinner(undefined);
+    setMoves([''.repeat(8)]);
+    setIsMyTurn(false);
+  };
 
   const askForRoom = async () => {
     socket.emit('find', {});
@@ -34,13 +42,16 @@ const GameContextProvider = ({ children }) => {
     setIsWinner(false);
   };
 
+  const leaveGame = () => {
+    socket.emit('leaveGame', { gameId });
+    resetGame();
+  };
+
   useEffect(() => {
     socket.on('beginGame', ({ gameId }) => {
+      resetGame();
       setGameId(gameId);
       setIsInQueue(false);
-      setIsWinner(undefined);
-      setMoves({});
-      /// TODO
       socket.emit('name', { gameId, playerName, playerID });
     });
 
@@ -69,7 +80,6 @@ const GameContextProvider = ({ children }) => {
     });
 
     socket.on('winner', ({ player }) => {
-      console.log('winner received', player);
       setIsWinner(player === playerID);
     });
 
@@ -114,6 +124,7 @@ const GameContextProvider = ({ children }) => {
         moves,
         isMyTurn,
         isInQueue,
+        leaveGame,
       }}
     >
       {children}
